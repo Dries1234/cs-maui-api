@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PublicRepoController : ControllerBase
     {
@@ -43,7 +43,14 @@ namespace API.Controllers
                         search(query: ""is:public stars:>100 pushed:>=2022-08-20"", type: REPOSITORY, first: 50) {
                                 nodes {
                                     ... on Repository {
-                                        name,
+                                         id,
+                                         name
+                                         description
+                                         stargazerCount
+                                         primaryLanguage {
+                                           name
+                                         },
+                                         url
                                     }
                                 }
                         }
