@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using API.Models;
+using API.Services;
+using AutoMapper;
+using API.dtos;
 
 namespace API.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
     public class PublicRepoController : ControllerBase
     {
@@ -14,8 +17,12 @@ namespace API.Controllers
         HttpClient client;
 
         IConfiguration configuration;
-        public PublicRepoController()
+        private readonly IApiRepo _repo;
+        private readonly IMapper _map;
+        public PublicRepoController(IApiRepo repo, IMapper map)
         {
+            _repo = repo;
+            _map = map;
             configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.json").Build();
             client = new HttpClient
             {
@@ -26,13 +33,35 @@ namespace API.Controllers
 
         }
 
-        [HttpGet(Name = "Repos")]
+        [HttpGet]
+        [Route("publicrepos")]
         public IEnumerable<Repository> Get()
         {
             var res = GetPublicRepos();
             Console.WriteLine(res.Result["data"]["search"]);
             var result = JsonSerializer.Deserialize<RepoNode>(res.Result["data"]["search"]);
             return result.nodes;
+        }
+
+        [HttpGet]
+        [Route("matches")]
+        public ActionResult GetMatches()
+        {
+            return Ok(_map.Map<Repository>(_repo.GetRepositories())); 
+        }
+
+        [HttpPost]
+        [Route("matches/add")]
+        public ActionResult AddMatch(RepositoryWriteDto repositoryWriteDto)
+        {
+            var repo = _map.Map<Repository>(repositoryWriteDto);
+            if (_repo.AddRepository(repo)) { 
+                return Ok();
+            }
+            else
+            {
+                return ValidationProblem();
+            }
         }
 
         private async Task<JsonNode> GetPublicRepos()

@@ -455,3 +455,7 @@ $RECYCLE.BIN/
 
 # Appsettings
 appsettings.json
+
+# db.env
+
+db.env

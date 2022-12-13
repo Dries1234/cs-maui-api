@@ -1,0 +1,21 @@
+﻿version: '2'
+volumes:
+  db_data:
+
+services:
+  api:
+    build: .
+    container_name: "cs_api"
+    depends_on:
+      - mysql
+    ports:
+      - "80:80"
+  mysql:
+    container_name: "cs_api_db"
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+    env_file:
+      - db.env
