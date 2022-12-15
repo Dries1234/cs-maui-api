@@ -38,7 +38,6 @@ namespace API.Controllers
         public IEnumerable<Repository> Get()
         {
             var res = GetPublicRepos();
-            Console.WriteLine(res.Result["data"]["search"]);
             var result = JsonSerializer.Deserialize<RepoNode>(res.Result["data"]["search"]);
             return result.nodes;
         }
@@ -47,15 +46,34 @@ namespace API.Controllers
         [Route("matches")]
         public ActionResult GetMatches()
         {
-            return Ok(_map.Map<Repository>(_repo.GetRepositories())); 
+            return Ok(_repo.GetRepositories()); 
         }
 
         [HttpPost]
         [Route("matches/add")]
         public ActionResult AddMatch(RepositoryWriteDto repositoryWriteDto)
         {
+            Console.WriteLine("Trying to add match...");
+            Console.WriteLine( JsonSerializer.Serialize(repositoryWriteDto).ToString());
             var repo = _map.Map<Repository>(repositoryWriteDto);
+            Console.WriteLine( JsonSerializer.Serialize(repo).ToString());
             if (_repo.AddRepository(repo)) { 
+                return Ok();
+            }
+            else
+            {
+                return ValidationProblem();
+            }
+        }
+
+
+        [HttpDelete]
+        [Route("matches/remove")]
+        public ActionResult RemoveMatch(RepositoryWriteDto repositoryWriteDto)
+        {
+            var repo = _repo.GetRepository(repositoryWriteDto.id);
+            if (_repo.RemoveRepository(repo))
+            {
                 return Ok();
             }
             else

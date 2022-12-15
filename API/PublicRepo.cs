@@ -28,7 +28,6 @@ namespace API.Models
     {
         public int id { get; set; }
 
-        [ForeignKey("langName")]
         public string name { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace API.Services
         Repository GetRepository(string id);
 
         Boolean AddRepository(Repository repository);
+        Boolean RemoveRepository(Repository repository);
 
 
     }
@@ -27,7 +28,7 @@ namespace API.Services
         {
             return _context.Repositories.ToList();
         }
-
+  
         public Repository GetRepository(string id)
         {
             return _context.Repositories.FirstOrDefault(r => r.id == id);
@@ -35,14 +36,33 @@ namespace API.Services
 
         public Boolean AddRepository(Repository repository)
         {
+            var existing = _context.Language.AsNoTracking().FirstOrDefault(l => l.name == repository.primaryLanguage.name);
+            if (existing != null)
+            {
+                repository.primaryLanguage.id = existing.id; 
+            }
             if(_context.Repositories.Any(r => r.id == repository.id))
             {
+                Console.WriteLine("Repo already exists???");
                 return false;
             }
-
+            _context.Language.Attach(repository.primaryLanguage);
             _context.Repositories.Add(repository);
             save();
+            Console.WriteLine("Returns true");
             return true;
+        }
+
+        public Boolean RemoveRepository(Repository repository)
+        {
+            var ToRemove = _context.Repositories.FirstOrDefault(r => r.id == repository.id);
+            if (ToRemove == null) return false;
+            else
+            {
+                _context.Repositories.Remove(repository);
+                save();
+                return true;
+            }
         }
 
         private void save()

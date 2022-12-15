@@ -19,3 +19,8 @@ services:
       - db_data:/var/lib/mysql
     env_file:
       - db.env
+  sql-migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
+    tty: true

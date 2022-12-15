@@ -9,5 +9,6 @@ namespace API.Services
 
         }
         public DbSet<Repository> Repositories { get; set; }
+        public DbSet<Language> Language { get; set; }
     }
 }
